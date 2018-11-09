@@ -6,69 +6,96 @@ typedef struct reg{
   struct reg *filho, *irmao; // registro de filhos e irmaos
 } TArvore;
 
-TArvore * criarnovo(){
+TArvore * raiz;
+
+TArvore * criarnovo(int info){
   TArvore * node = malloc(sizeof (TArvore));
   node->filho = node->irmao = NULL;
+  node->info = info;
 
   return node;
 }
 
 TArvore * buscarInfo(TArvore * r, int info) {
-  if ( r == NULL || (r->irmao == NULL && r->filho == NULL) || r->info == info)
+  if (r->filho == NULL && r->irmao == NULL)
+    return r;
+
+  if (r->info == info)
     return r;
 
   TArvore * p = r->filho;
-  while(p){
+  while(1){
+    printf("Buscando filho\n");
     TArvore * resp = buscarInfo(p, info);
-    if (resp) return resp;
+    if(p->irmao != NULL)
+      p = p->irmao;
+    else if (p->filho != NULL)
+      p = p->filho;
+    else if (p->)
     p = p->irmao;
   }
 
   return NULL;
 }
 
-void inserir(TArvore * r, int info){
+void inserir(TArvore * r){
   int conteudo;
-  TArvore * novo, * irmao;
-
-  novo = criarnovo();
+  TArvore * novo, * ultimoIrmao, * pai;
 
   printf("\nProcurar Pai: ");
   scanf("%d", &conteudo);
-  irmao = buscarInfo(r, info);
+  pai = buscarInfo(r, conteudo);
 
-  if(irmao != NULL){
+  if(pai != NULL){
     printf("\nInserir valor: ");
     scanf("%d", &conteudo);
 
-    printf("Foi\n" );
-    while (irmao != NULL)
-      irmao = irmao->irmao;
+    ultimoIrmao = pai->filho;
 
-    irmao->irmao = novo;
-    novo->info = info;
+    while (ultimoIrmao->irmao != NULL ){
+      ultimoIrmao = ultimoIrmao->irmao;
+    }
+
+    novo = criarnovo(conteudo);
+    ultimoIrmao->irmao = novo;
 
   } else {
     printf("\n\nPai %d nao encontrado\n", conteudo);
   }
 
+}
 
+void listarArvore(TArvore * pointer) {
+  if (pointer == NULL) return ;
+  printf("%d(", pointer->info );
+  TArvore * p = pointer->filho;
+
+  while(p){
+    listarArvore(p);
+    p = p->irmao;
+  }
+  printf(")" );
 }
 
 void main() {
   int info;
-  TArvore * raiz = criarnovo();
+  printf("\nCriando raiz\n" );
+  printf("Insira valor:" );
+  scanf("%d", &info );
+  raiz = criarnovo(info);
 
   while (1){
-    printf("\nInserir informacao: (0-nao)");
+    printf("\nInserir novas informacoes? (0-nao) ");
     scanf("%d", &info);
 
     if(info != 0) {
-      inserir(raiz, info);
+      inserir(raiz);
+      listarArvore(raiz);
     } else {
-      printf("Saindo\n" );
       break;
     }
   }
+
+  listarArvore(raiz);
 
 }
